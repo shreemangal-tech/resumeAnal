@@ -83,4 +83,10 @@ describe("resume extraction", () => {
     expect(audit.parameters[4].criteria[0]).toMatchObject({ status: "not_followed" });
     expect(audit.parameters[4].criteria[0].evidence).toMatch(/MY JOURNEY/);
   });
+
+  it("normalizes conservative OCR heading noise", async () => {
+    const file = new File(["Mahesh Kumar\nPROFILE\nFrontend developer with reliable application experience.\nE D U C A T I O N\nBachelor degree from Example University in 2026 with CGPA 8.1\nTECHNICAL SKILLS\nReact TypeScript JavaScript HTML CSS"], "ocr.txt", { type: "text/plain" });
+    const extracted = await extractResume(file);
+    expect(extracted.headings).toEqual(expect.arrayContaining(["PROFILE", "E D U C A T I O N", "TECHNICAL SKILLS"]));
+  });
 });

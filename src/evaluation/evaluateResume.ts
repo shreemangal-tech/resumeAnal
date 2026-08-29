@@ -42,7 +42,7 @@ function recencyYears(line: string): number[] {
 }
 
 function chronologicalStatus(evidence: ResumeEvidence): { value: boolean; detail: string } {
-  const labels = ["education", "projects", "project", "selected company projects", "personal open source engineering", "experience", "work experience", "professional experience", "achievements", "certifications", "training", "trainings", "activities", "academic activities"];
+  const labels = ["education", "projects", "project", "academic projects", "selected company projects", "personal open source engineering", "experience", "work experience", "professional experience", "achievements", "certifications", "linkedin certificates", "training", "trainings", "activities", "academic activities"];
   const datedSections = labels.map((label) => ({ label, lines: sectionLines(evidence, [label]) })).filter((section) => section.lines !== null);
   if (!datedSections.length) return { value: false, detail: "No dated section was available to establish reverse chronological order." };
   for (const section of datedSections) {
@@ -93,13 +93,14 @@ type ParameterEvaluator = (evidence: ResumeEvidence, criteria: string[]) => Crit
 
 export const parameterEvaluators: ParameterEvaluator[] = [
   (evidence, criteria) => {
+    const scanned = evidence.extractionMethod === "pdf-ocr";
     const margins = evidence.formatting.marginsInches;
     const evenMargins = margins ? Math.abs(margins[1] - margins[3]) <= 0.1 && Math.abs(margins[0] - margins[2]) <= 0.1 : true;
     const shaded = evidence.formatting.hasShading;
     const noDarkBlocksOrUnevenMargins = shaded !== true && evenMargins;
     const pageDivisor = evidence.pageCount && evidence.pageCount > 0 ? evidence.pageCount : 1;
     const noOvercrowding = evidence.lines.length / pageDivisor <= 65;
-    const uniformFont = !evidence.formatting.fontFamilies || evidence.formatting.fontFamilies.length <= 1;
+    const uniformFont = evidence.formatting.fontFamilies !== null && evidence.formatting.fontFamilies.length <= 1;
     const tagline = evidence.lines.slice(1, 5).find((line) => !/@|https?:|linkedin|\+?\d[\d\s()-]{7,}/i.test(line));
     return [
       assessment(criteria[0], evidence.pageCount === 1, "The resume has exactly one page.", evidence.pageCount === null ? "The page count could not be confirmed as exactly one." : `The resume has ${evidence.pageCount} pages.`),
@@ -107,19 +108,22 @@ export const parameterEvaluators: ParameterEvaluator[] = [
       evidence.formatting.hasImages === false
         ? result(criteria[2], "followed", "No photo or embedded image is present, so the conditional photo requirement is satisfied.")
         : result(criteria[2], "not_followed", evidence.formatting.hasImages ? "An embedded image is present and the required professional passport-style photo format is not established." : "The conditional photo requirement could not be confirmed."),
-      assessment(criteria[3], uniformFont, evidence.formatting.fontFamilies?.length ? `One font family is used throughout: ${evidence.formatting.fontFamilies[0]}.` : "No conflicting font family or spacing pattern was detected.", `Multiple font families were detected: ${evidence.formatting.fontFamilies?.join(", ")}.`),
-      assessment(criteria[4], noDarkBlocksOrUnevenMargins, "No shading was detected and page margins are even.", "Shading or uneven page margins were detected."),
+      assessment(criteria[3], uniformFont, evidence.formatting.fontFamilies?.length ? `One font family is used throughout: ${evidence.formatting.fontFamilies[0]}.` : "No conflicting font family or spacing pattern was detected.", scanned ? "Font and spacing uniformity cannot be reliably verified from a scanned page image." : `Multiple font families were detected: ${evidence.formatting.fontFamilies?.join(", ")}.`),
+      scanned
+        ? result(criteria[4], "not_followed", "Dark shading and exact page margins cannot be reliably verified from a scanned page image.")
+        : assessment(criteria[4], noDarkBlocksOrUnevenMargins, "No shading was detected and page margins are even.", "Shading or uneven page margins were detected."),
       assessment(criteria[5], tagline ? rolePattern.test(tagline) : false, tagline ? `The line below the name reads “${tagline.slice(0, 120)}”.` : "", tagline ? `The line below the name does not clearly state a job role or qualification: “${tagline.slice(0, 120)}”.` : "No job-role or qualification tagline was detected near the name."),
     ];
   },
   (evidence, criteria) => {
     const f = evidence.formatting;
+    const scanned = evidence.extractionMethod === "pdf-ocr";
     const knownLayout = [f.hasTables, f.hasTextBoxes, f.hasColumns];
     const layoutValue = !knownLayout.some((value) => value === true) && f.hasImages !== true;
     const detectedLayout = [f.hasTables === true && "table", f.hasTextBoxes === true && "text box", f.hasColumns === true && "multi-column layout", f.hasImages === true && "embedded image"].filter(Boolean).join(", ");
-    const fontValue = f.fontFamilies === null || f.fontFamilies.length <= 1;
-    const marginValue = f.marginsInches === null || f.marginsInches.every((margin) => margin >= 0.5 && margin <= 1);
-    const bodyFontValue = !f.bodyFontSizes?.length || f.bodyFontSizes.every((size) => size >= 10 && size <= 12);
+    const fontValue = f.fontFamilies !== null && f.fontFamilies.length <= 1;
+    const marginValue = f.marginsInches !== null && f.marginsInches.every((margin) => margin >= 0.5 && margin <= 1);
+    const bodyFontValue = f.bodyFontSizes !== null && f.bodyFontSizes.length > 0 && f.bodyFontSizes.every((size) => size >= 10 && size <= 12);
     const headingStyles = evidence.headings.map((heading) => heading === heading.toUpperCase() ? "uppercase" : "mixed-case");
     const consistentHeadingStyle = headingStyles.length > 0 && new Set(headingStyles).size === 1;
     const prohibitedDecoration = [f.hasBorders, f.hasShading, f.usesNonStandardColors];
@@ -127,12 +131,14 @@ export const parameterEvaluators: ParameterEvaluator[] = [
     const detectedDecoration = [f.hasBorders === true && "borders", f.hasShading === true && "shading", f.usesNonStandardColors === true && "non-standard colors"].filter(Boolean).join(", ");
     return [
       assessment(criteria[0], layoutValue, "No table, text box, column, or embedded layout image was detected.", `Detected prohibited layout elements: ${detectedLayout}.`),
-      assessment(criteria[1], fontValue, f.fontFamilies?.length ? `Exactly one font family was detected: ${f.fontFamilies[0]}.` : "No conflicting font family was detected.", `Multiple font families were detected: ${f.fontFamilies?.join(", ")}.`),
-      assessment(criteria[2], marginValue, f.marginsInches ? `All detected margins are within 0.5–1 inch: ${f.marginsInches.join(", ")}.` : "No margin outside the required 0.5–1 inch range was detected.", `Detected margins fall outside 0.5–1 inch: ${f.marginsInches?.join(", ")}.`),
-      assessment(criteria[3], bodyFontValue, f.bodyFontSizes?.length ? `Dominant body font sizes are within 10–12 pt: ${f.bodyFontSizes.join(", ")}.` : "No body font size outside 10–12 pt was detected.", `Dominant body font sizes fall outside 10–12 pt: ${f.bodyFontSizes?.join(", ")}.`),
+      assessment(criteria[1], fontValue, f.fontFamilies?.length ? `Exactly one font family was detected: ${f.fontFamilies[0]}.` : "No conflicting font family was detected.", scanned ? "The font family cannot be reliably verified from a scanned page image." : `Multiple font families were detected: ${f.fontFamilies?.join(", ")}.`),
+      assessment(criteria[2], marginValue, f.marginsInches ? `All detected margins are within 0.5–1 inch: ${f.marginsInches.join(", ")}.` : "No margin outside the required 0.5–1 inch range was detected.", scanned ? "Exact margins cannot be reliably verified from a scanned page image." : `Detected margins fall outside 0.5–1 inch: ${f.marginsInches?.join(", ")}.`),
+      assessment(criteria[3], bodyFontValue, f.bodyFontSizes?.length ? `Dominant body font sizes are within 10–12 pt: ${f.bodyFontSizes.join(", ")}.` : "No body font size outside 10–12 pt was detected.", scanned ? "Body font size cannot be reliably verified from a scanned page image." : `Dominant body font sizes fall outside 10–12 pt: ${f.bodyFontSizes?.join(", ")}.`),
       assessment(criteria[4], consistentHeadingStyle, "Detected section headings use one consistent capitalization pattern.", headingStyles.length ? "Section headings mix capitalization patterns for the same purpose." : "No section headings were available for the required consistency check."),
       assessment(criteria[5], listUsesBullets(evidence), "Detected list entries use bullet markers; project titles and technology labels were excluded from the list check.", "A multi-entry work or project section was detected without bullet markers."),
-      assessment(criteria[6], decorationValue, "No borders, shading, or non-standard text colors were detected.", `Detected prohibited formatting: ${detectedDecoration}.`),
+      scanned
+        ? result(criteria[6], "not_followed", "Borders, shading, and exact text colors cannot be reliably verified from a scanned page image.")
+        : assessment(criteria[6], decorationValue, "No borders, shading, or non-standard text colors were detected.", `Detected prohibited formatting: ${detectedDecoration}.`),
     ];
   },
   (evidence, criteria) => {
@@ -176,7 +182,7 @@ export const parameterEvaluators: ParameterEvaluator[] = [
     ];
   },
   (evidence, criteria) => {
-    const objective = sectionText(evidence, ["objective", "career objective", "summary", "professional summary"]);
+    const objective = sectionText(evidence, ["objective", "career objective", "summary", "professional summary", "profile"]);
     if (!objective) return [
       result(criteria[0], "not_followed", "No Career Objective or Summary section was detected."),
       result(criteria[1], "not_followed", "No Career Objective or Summary section was detected."),
@@ -238,7 +244,7 @@ export const parameterEvaluators: ParameterEvaluator[] = [
     ];
   },
   (evidence, criteria) => {
-    const dedicatedLines = sectionLines(evidence, ["interpersonal skills"]);
+    const dedicatedLines = sectionLines(evidence, ["interpersonal skills", "soft skills"]);
     const technicalLines = sectionLines(evidence, ["skills", "technical skills"]) ?? [];
     const appliedLines = evidence.lines.filter((line) => /\b(?:mentor(?:ed|ing)?|collaborat(?:e|ed|ion)|worked closely|cross[ -]functional|knowledge sharing|code reviews?|product, backend, qa|designers? and backend|team delivery|stakeholders?)\b/i.test(line));
     const lines = dedicatedLines?.length ? dedicatedLines : appliedLines;
@@ -299,7 +305,7 @@ export const parameterEvaluators: ParameterEvaluator[] = [
     ];
   },
   (evidence, criteria) => {
-    const groups = [["projects", "project", "selected company projects", "company projects", "personal open source engineering", "open source projects"], ["training", "trainings"]]
+    const groups = [["projects", "project", "academic projects", "selected company projects", "company projects", "personal open source engineering", "open source projects"], ["training", "trainings"]]
       .map((labels) => sectionLines(evidence, labels)).filter((lines): lines is string[] => Boolean(lines?.length));
     const entries = groups.flat();
     if (!entries.length) return criteria.map((criterion) => result(criterion, "not_followed", "No Trainings or Projects entry was detected."));
@@ -362,6 +368,7 @@ export function evaluateResume(evidence: ResumeEvidence): AuditResult {
 
   return {
     sourceFileName: evidence.fileName,
+    extractionMethod: evidence.extractionMethod,
     parameters,
     awardedTotal: parameters.reduce((sum, parameter) => sum + parameter.awardedScore, 0),
     maximumTotal: 39,

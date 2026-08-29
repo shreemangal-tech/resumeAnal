@@ -52,7 +52,10 @@ h1 em { font-family: "Playfair Display", serif; font-weight: 600; color: #477052
 .score-explainer { display: grid; grid-template-columns: auto 1fr; gap: 12px 24px; align-items: baseline; margin: -20px 0 28px; padding: 14px 16px; border-left: 3px solid #d09535; background: #fffefa; color: #56625b; font-size: 13px; line-height: 1.55; }
 .score-explainer strong { color: #18211d; white-space: nowrap; }
 .score-strip-region { position: relative; }
-.score-strip-help { margin: 0 0 8px; color: #66716a; font-family: "DM Mono", monospace; text-transform: uppercase; letter-spacing: .08em; font-size: 9px; text-align: right; }
+.score-strip-toolbar { display: flex; justify-content: flex-end; align-items: center; gap: 14px; margin-bottom: 8px; }
+.score-strip-help { margin: 0; color: #66716a; font-family: "DM Mono", monospace; text-transform: uppercase; letter-spacing: .08em; font-size: 9px; text-align: right; }
+.copy-marks-button { border: 1px solid #18211d; background: #18211d; color: #fff; padding: 8px 11px; font-size: 11px; white-space: nowrap; }
+.copy-marks-button:hover { background: #477052; border-color: #477052; }
 .score-strip { display: grid; grid-template-columns: repeat(12, minmax(150px, 1fr)); overflow-x: auto; border: 1px solid #bfc5bf; background: #fffefa; }
 .score-strip:focus-visible { outline: 2px solid #477052; outline-offset: 3px; }
 .score-cell { min-height: 170px; padding: 16px; border-right: 1px solid #d8dcd7; display: flex; flex-direction: column; }

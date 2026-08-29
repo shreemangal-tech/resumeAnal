@@ -15,6 +15,7 @@ export default function App() {
   const [state, setState] = useState<AppState>("upload");
   const [result, setResult] = useState<AuditResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [processingMessage, setProcessingMessage] = useState("Checking only the approved resume criteria—nothing extra.");
 
   function selectFile(nextFile: File | null) {
     if (nextFile && !/\.(pdf|docx|txt)$/i.test(nextFile.name)) {
@@ -30,9 +31,10 @@ export default function App() {
   async function runAudit() {
     if (!file) return;
     setError(null);
+    setProcessingMessage("Reading resume...");
     setState("processing");
     try {
-      const evidence = await extractResume(file);
+      const evidence = await extractResume(file, ({ message }) => setProcessingMessage(message));
       setResult(evaluateResume(evidence));
       setState("result");
     } catch (caught) {
@@ -90,7 +92,7 @@ export default function App() {
           <div className="spinner"><span /><span /><span /></div>
           <span className="eyebrow">Audit in progress</span>
           <h1>Reading the evidence.</h1>
-          <p>Checking only the approved resume criteria—nothing extra.</p>
+          <p>{processingMessage}</p>
         </section>
       )}
 
@@ -104,6 +106,7 @@ export default function App() {
           <aside className="score-explainer" aria-label="How workbook marking works">
             <strong>Marks and source checks are different.</strong>
             <span>“Maximum 3 marks” is the parameter score. The workbook may list more than three checks; the number not followed selects the 3/2/1/0 band. Trainings and Projects uses 6/4/2/0.</span>
+            {result.extractionMethod === "pdf-ocr" && <span><strong>Scanned PDF:</strong> Text was read with OCR. Font sizes, margins, and exact visual formatting are marked conservatively when the source image cannot prove them.</span>}
           </aside>
           <ScoreStrip parameters={result.parameters} />
           <div className="report-heading"><span>Detailed review</span><span>{result.parameters.length} parameters</span></div>

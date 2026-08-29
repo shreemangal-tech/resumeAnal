@@ -16,6 +16,7 @@
     "pdfjs-dist": "latest",
     "react": "latest",
     "react-dom": "latest",
+    "tesseract.js": "7.0.0",
     "vite": "latest"
   },
   "devDependencies": {
@@ -27,5 +28,10 @@
     "jsdom": "latest",
     "typescript": "latest",
     "vitest": "latest"
+  },
+  "pnpm": {
+    "ignoredBuiltDependencies": [
+      "tesseract.js"
+    ]
   }
 }

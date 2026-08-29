@@ -16,9 +16,20 @@ export type ParameterResult = {
   scoringNote?: string;
 };
 
+export type ExtractionMethod = "pdf-text" | "pdf-ocr" | "docx" | "txt";
+
+export type PageExtraction = {
+  pageNumber: number;
+  method: "text" | "ocr";
+  text: string;
+};
+
 export type ResumeEvidence = {
   fileName: string;
   fileType: string;
+  extractionMethod?: ExtractionMethod;
+  ocrConfidence?: number | null;
+  pageExtractions?: PageExtraction[];
   text: string;
   pageCount: number | null;
   lines: string[];
@@ -44,6 +55,7 @@ export type ResumeEvidence = {
 
 export type AuditResult = {
   sourceFileName: string;
+  extractionMethod?: ExtractionMethod;
   parameters: ParameterResult[];
   awardedTotal: number;
   maximumTotal: 39;

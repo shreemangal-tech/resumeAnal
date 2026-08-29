@@ -83,7 +83,7 @@ describe("resume audit workflow", () => {
 
     fireEvent.click(start);
     expect(await screen.findByRole("heading", { name: "resume.txt" })).toBeInTheDocument();
-    expect(extractResume).toHaveBeenCalledWith(file);
+    expect(extractResume).toHaveBeenCalledWith(file, expect.any(Function));
     expect(evaluateResume).toHaveBeenCalledWith(evidence);
     expect(screen.getAllByRole("article")).toHaveLength(12);
     expect(screen.getAllByRole("button", { name: "Copy audit" })).toHaveLength(12);
