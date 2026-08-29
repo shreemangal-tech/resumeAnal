@@ -85,4 +85,31 @@ describe("resume evaluation", () => {
     ]);
     expect(audit.parameters[10].awardedScore).toBe(3);
   });
+
+  it("treats a date range as one entry date when checking reverse chronology", () => {
+    const lines = [
+      "Aarav Sharma",
+      "PROFESSIONAL EXPERIENCE",
+      "Senior Engineer | Jul 2023 - Present",
+      "• Built stable React applications for clients.",
+      "Engineer | Feb 2022 - Jul 2023",
+      "• Developed reliable TypeScript workflows for users.",
+      "Junior Engineer | Sep 2018 - Feb 2022",
+      "• Supported application delivery for customers.",
+    ];
+    const audit = evaluateResume({ ...evidence, text: lines.join("\n"), lines, headings: ["PROFESSIONAL EXPERIENCE"], bullets: lines.filter((line) => line.startsWith("•")) });
+    expect(audit.parameters[2].criteria[1], audit.parameters[2].criteria[1].evidence).toMatchObject({ status: "followed" });
+  });
+
+  it("checks a multi-line education entry as one complete entry", () => {
+    const lines = [
+      "Aarav Sharma",
+      "EDUCATION",
+      "Bachelor of Technology in Computer Science",
+      "Example University | Example University",
+      "2026 | CGPA 8.5",
+    ];
+    const audit = evaluateResume({ ...evidence, text: lines.join("\n"), lines, headings: ["EDUCATION"], bullets: [] });
+    expect(audit.parameters[6].criteria[1]).toMatchObject({ status: "followed" });
+  });
 });

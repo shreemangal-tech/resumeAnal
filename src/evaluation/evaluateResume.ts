@@ -33,8 +33,12 @@ function sentenceCount(text: string): number {
   return (text.match(/[.!?](?:\s|$)/g) ?? []).length;
 }
 
-function extractYears(lines: string[]): number[] {
-  return lines.flatMap((line) => [...line.matchAll(/\b(?:19|20)\d{2}\b/g)].map((match) => Number(match[0])));
+function recencyYears(line: string): number[] {
+  const ranges = [...line.matchAll(/\b((?:19|20)\d{2})\s*[-–—]\s*(?:(?:jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)[,.]?\s+)?((?:19|20)\d{2}|present|current)\b/gi)];
+  if (ranges.length) {
+    return ranges.map((match) => /present|current/i.test(match[2]) ? Number.POSITIVE_INFINITY : Number(match[2]));
+  }
+  return [...line.matchAll(/\b(?:19|20)\d{2}\b/g)].map((match) => Number(match[0]));
 }
 
 function chronologicalStatus(evidence: ResumeEvidence): { value: boolean; detail: string } {
@@ -42,7 +46,7 @@ function chronologicalStatus(evidence: ResumeEvidence): { value: boolean; detail
   const datedSections = labels.map((label) => ({ label, lines: sectionLines(evidence, [label]) })).filter((section) => section.lines !== null);
   if (!datedSections.length) return { value: false, detail: "No dated section was available to establish reverse chronological order." };
   for (const section of datedSections) {
-    const years = extractYears(section.lines!);
+    const years = section.lines!.flatMap(recencyYears);
     if (!years.length && section.lines!.length > 0) return { value: false, detail: `${section.label} entries do not expose dates for chronological review.` };
     if (years.some((year, index) => index > 0 && year > years[index - 1])) return { value: false, detail: `${section.label} dates are not in reverse chronological order: ${years.join(", ")}.` };
   }
@@ -186,8 +190,19 @@ export const parameterEvaluators: ParameterEvaluator[] = [
     if (!lines?.length) return criteria.map((criterion) => result(criterion, "not_followed", "No Education section was detected."));
     const text = lines.join(" ");
     const wrongTerm = /\b(?:10th|12th|\+1|\+2|class\s+[xvi]+)\b/i.test(text);
-    const entries = lines.filter((line) => /\b(?:19|20)\d{2}\b|\b(?:secondary|bachelor|master|diploma|degree|b\.?tech|m\.?tech|bca|mca)\b/i.test(line));
-    const completeEntries = entries.length > 0 && entries.every((line) => /\b(?:school|college|university|institute|academy)\b/i.test(line) && /\b(?:board|university|cbse|icse|isc|state board)\b/i.test(line) && /\b(?:19|20)\d{2}\b/.test(line) && /(?:\b(?:cgpa|gpa|percentage)\b|\b\d{1,3}(?:\.\d+)?%)/i.test(line));
+    const entryStart = /\b(?:secondary|senior secondary|bachelor|master|diploma|degree|b\.?tech|m\.?tech|bca|mca)\b/i;
+    const entries = lines.reduce<string[][]>((groups, line) => {
+      if (entryStart.test(line) || groups.length === 0) groups.push([line]);
+      else groups[groups.length - 1].push(line);
+      return groups;
+    }, []).filter((entry) => entry.some((line) => entryStart.test(line)));
+    const completeEntries = entries.length > 0 && entries.every((entry) => {
+      const entryText = entry.join(" ");
+      return /\b(?:school|college|university|institute|academy)\b/i.test(entryText)
+        && /\b(?:board|university|cbse|icse|isc|state board)\b/i.test(entryText)
+        && /\b(?:19|20)\d{2}\b/.test(entryText)
+        && /(?:\b(?:cgpa|gpa|percentage)\b|\b\d{1,3}(?:\.\d+)?%)/i.test(entryText);
+    });
     const abbreviation = text.match(/\b(?:b\.?tech|m\.?tech|b\.?sc|m\.?sc|bca|mca)\b/i)?.[0];
     const spelledOut = /\b(?:bachelor|master)\b/i.test(text);
     return [
