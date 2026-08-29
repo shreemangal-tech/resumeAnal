@@ -87,6 +87,7 @@ describe("resume audit workflow", () => {
     expect(evaluateResume).toHaveBeenCalledWith(evidence);
     expect(screen.getAllByRole("article")).toHaveLength(12);
     expect(screen.getAllByRole("button", { name: "Copy audit" })).toHaveLength(12);
+    expect(screen.getByRole("complementary", { name: "How workbook marking works" })).toHaveTextContent("Marks and source checks are different");
 
     fireEvent.click(screen.getByRole("button", { name: "Audit another resume" }));
     expect(screen.getByRole("heading", { name: "Upload your resume" })).toBeInTheDocument();

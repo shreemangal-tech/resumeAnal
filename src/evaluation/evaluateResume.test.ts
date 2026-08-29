@@ -39,6 +39,13 @@ describe("resume evaluation", () => {
     expect(audit.parameters.map((parameter) => parameter.criteria.length)).toEqual([6, 7, 3, 3, 3, 4, 3, 4, 6, 5, 5, 4]);
   });
 
+  it("keeps every displayed mark and the /39 total reconciled to its source checks", () => {
+    const audit = evaluateResume(evidence);
+    expect(audit.awardedTotal).toBe(audit.parameters.reduce((total, parameter) => total + parameter.awardedScore, 0));
+    expect(audit.parameters.every((parameter) => parameter.scoringNote?.startsWith("Workbook band rule:"))).toBe(true);
+    expect(audit.parameters.every((parameter) => parameter.criteria.every((criterion) => criterion.status === "followed" || criterion.status === "not_followed"))).toBe(true);
+  });
+
   it("uses only the workbook's followed/not-followed decisions", () => {
     const audit = evaluateResume(evidence);
     expect(audit.parameters.flatMap((parameter) => parameter.criteria).every((criterion) => ["followed", "not_followed"].includes(criterion.status))).toBe(true);

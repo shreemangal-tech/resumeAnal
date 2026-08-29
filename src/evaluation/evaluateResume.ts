@@ -329,6 +329,7 @@ export function evaluateResume(evidence: ResumeEvidence): AuditResult {
       awardedScore: resolution.score,
       criteria,
       feedback: criteria.filter((criterion) => criterion.status === "not_followed").map(feedbackFor),
+      scoringNote: `Workbook band rule: ${resolution.rule}`,
     };
   });
 

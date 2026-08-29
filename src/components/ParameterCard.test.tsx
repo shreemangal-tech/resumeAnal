@@ -13,7 +13,7 @@ describe("per-parameter copy output", () => {
       feedback: ["A year is missing."],
       criteria: [{ criterionText: "Year present for every entry.", status: "not_followed", evidence: "One entry has no year." }],
     };
-    expect(copyAuditText(parameter)).toBe("Education (3)\nMark: 2 / 3\nBand: Satisfactory\nCount: 0 of 1 criteria followed; 1 not followed\n- not followed: Year present for every entry.\n  Evidence: One entry has no year.");
+    expect(copyAuditText(parameter)).toBe("Education (3)\nMark: 2 / 3\nBand: Satisfactory\nSource checks (not marks): 0 of 1 followed; 1 not followed\n- not followed: Year present for every entry.\n  Evidence: One entry has no year.");
   });
 
   it("copies the selected parameter from its card", async () => {
@@ -30,7 +30,7 @@ describe("per-parameter copy output", () => {
 
     render(<ParameterCard parameter={parameter} index={6} />);
     expect(screen.getByText("Highly Satisfactory")).toBeInTheDocument();
-    expect(screen.getByText("1 of 1 criteria followed")).toBeInTheDocument();
+    expect(screen.getByText("Source checks (not marks): 1/1 followed")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Copy audit" }));
 
     await waitFor(() => expect(writeText).toHaveBeenCalledWith(copyAuditText(parameter)));

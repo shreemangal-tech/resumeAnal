@@ -42,13 +42,15 @@ h1 em { font-family: "Playfair Display", serif; font-weight: 600; color: #477052
 @keyframes pulse { to { transform: translateY(-10px); opacity: .35; } }
 .results-view { padding: 56px clamp(20px, 5vw, 76px) 100px; max-width: 1800px; margin: auto; }
 .results-header { display: grid; grid-template-columns: 1fr auto auto; gap: 28px; align-items: end; margin-bottom: 48px; }
-.results-header h1 { font-size: clamp(34px, 5vw, 62px); margin: 10px 0; overflow-wrap: anywhere; }
+.results-header h1 { font-size: clamp(30px, 3.5vw, 50px); line-height: 1.02; letter-spacing: -.045em; margin: 10px 0; overflow-wrap: break-word; }
 .results-header p { color: #66716a; margin: 0; }
 .total-card { min-width: 150px; background: #18211d; color: white; padding: 20px 24px; }
 .total-card span { font-family: "DM Mono", monospace; text-transform: uppercase; font-size: 10px; color: #b8c1bb; }
 .total-card strong { display: block; font-size: 40px; margin-top: 5px; }.total-card small, .score-mark small, .card-score small { font-size: .45em; font-weight: 500; opacity: .65; }
 .secondary-button, .copy-button { border: 1px solid #9da49f; background: transparent; padding: 12px 16px; }
 .secondary-button:hover, .copy-button:hover { border-color: #18211d; background: #fffefa; }
+.score-explainer { display: grid; grid-template-columns: auto 1fr; gap: 12px 24px; align-items: baseline; margin: -20px 0 28px; padding: 14px 16px; border-left: 3px solid #d09535; background: #fffefa; color: #56625b; font-size: 13px; line-height: 1.55; }
+.score-explainer strong { color: #18211d; white-space: nowrap; }
 .score-strip-region { position: relative; }
 .score-strip-help { margin: 0 0 8px; color: #66716a; font-family: "DM Mono", monospace; text-transform: uppercase; letter-spacing: .08em; font-size: 9px; text-align: right; }
 .score-strip { display: grid; grid-template-columns: repeat(12, minmax(150px, 1fr)); overflow-x: auto; border: 1px solid #bfc5bf; background: #fffefa; }
@@ -57,7 +59,8 @@ h1 em { font-family: "Playfair Display", serif; font-weight: 600; color: #477052
 .score-cell:last-child { border-right: 0; }
 .score-index { font-family: "DM Mono", monospace; color: #ef5b35; font-size: 10px; }
 .score-cell strong { font-size: 12px; line-height: 1.45; margin-top: 18px; }
-.score-band { margin-top: 9px; color: #66716a; font-size: 10px; line-height: 1.4; }
+.score-maximum { margin-top: 7px; color: #18211d; font-family: "DM Mono", monospace; font-size: 9px; line-height: 1.4; text-transform: uppercase; }
+.score-band { margin-top: 5px; color: #66716a; font-size: 10px; line-height: 1.4; }
 .score-mark { font-size: 32px; font-weight: 600; margin-top: auto; }
 .report-heading { display: flex; justify-content: space-between; margin: 58px 0 18px; padding-bottom: 10px; border-bottom: 1px solid #aeb5ae; font-family: "DM Mono", monospace; text-transform: uppercase; font-size: 11px; }
 .parameter-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
@@ -82,4 +85,4 @@ summary { cursor: pointer; font-size: 13px; font-weight: 600; }
 .criterion strong { font-family: "DM Mono", monospace; text-transform: uppercase; font-size: 9px; color: #6a746d; }
 .criterion p { margin: 4px 0; font-size: 13px; line-height: 1.5; }.criterion small { color: #737c76; line-height: 1.45; display: block; }
 @media (max-width: 900px) { .upload-view { grid-template-columns: 1fr; padding-top: 48px; }.results-header { grid-template-columns: 1fr 1fr; }.results-header > div:first-child { grid-column: 1/-1; }.parameter-grid { grid-template-columns: 1fr; } }
-@media (max-width: 560px) { .version { display: none; }.upload-view { padding: 40px 18px 70px; }.upload-panel { box-shadow: 7px 7px 0 #d9dfd4; }.results-view { padding-inline: 14px; }.results-header { grid-template-columns: 1fr; }.results-header > div:first-child { grid-column: auto; }.parameter-card header { flex-direction: column; }.card-actions { width: 100%; justify-content: space-between; } }
+@media (max-width: 560px) { .version { display: none; }.upload-view { padding: 40px 18px 70px; }.upload-panel { box-shadow: 7px 7px 0 #d9dfd4; }.results-view { padding-inline: 14px; }.results-header { grid-template-columns: 1fr; }.results-header > div:first-child { grid-column: auto; }.score-explainer { grid-template-columns: 1fr; }.score-explainer strong { white-space: normal; }.parameter-card header { flex-direction: column; }.card-actions { width: 100%; justify-content: space-between; } }

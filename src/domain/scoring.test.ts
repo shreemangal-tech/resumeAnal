@@ -6,6 +6,21 @@ import { rubric } from "./rubric";
 const criteria = (statuses: CriterionStatus[]): CriterionResult[] => statuses.map((status, index) => ({ criterionText: `criterion ${index}`, status }));
 
 describe("source-specific scoring", () => {
+  const expectedScoresByFailed = [
+    [3, 2, 2, 1, 1, 0, 0],
+    [3, 2, 2, 1, 1, 0, 0, 0],
+    [3, 2, 1, 0],
+    [3, 2, 1, 0],
+    [3, 2, 1, 0],
+    [3, 2, 1, 1, 0],
+    [3, 2, 1, 0],
+    [3, 2, 1, 0, 0],
+    [3, 2, 1, 0, 0, 0, 0],
+    [3, 2, 1, 0, 0, 0],
+    [3, 2, 2, 1, 1, 0],
+    [6, 4, 4, 2, 0],
+  ] as const;
+
   const bandCases = [
     { full: 0, satisfactory: 1, average: 3, dissatisfactory: 6 },
     { full: 0, satisfactory: 1, average: 3, dissatisfactory: 7 },
@@ -44,6 +59,24 @@ describe("source-specific scoring", () => {
   it("uses the workbook's Satisfactory one-or-two-failure rule for Formatting", () => {
     const resolution = scoreParameter(1, criteria(["followed", "followed", "followed", "followed", "followed", "not_followed", "not_followed"]));
     expect(resolution.score).toBe(2);
+  });
+
+  it.each(rubric.map((parameter, index) => [index, parameter.parameter] as const))(
+    "maps every possible failed-check count for parameter %i: %s",
+    (index) => {
+      const parameter = rubric[index];
+      const actual = parameter.criteriaList.map((_, failed) => {
+        const statuses: CriterionStatus[] = parameter.criteriaList.map((__, criterionIndex) => criterionIndex < failed ? "not_followed" : "followed");
+        return scoreParameter(index, criteria(statuses)).score;
+      });
+      const allFailed = parameter.criteriaList.map(() => "not_followed" as const);
+      actual.push(scoreParameter(index, criteria(allFailed)).score);
+      expect(actual).toEqual(expectedScoresByFailed[index]);
+    },
+  );
+
+  it("rejects a check count that does not exactly match the workbook", () => {
+    expect(() => scoreParameter(0, criteria(["followed", "followed", "followed"]))).toThrow(/exactly 6 source checks/);
   });
 
   it("strictly assigns undefined intermediate failure counts to the lower workbook band", () => {
