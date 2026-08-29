@@ -112,4 +112,25 @@ describe("resume evaluation", () => {
     const audit = evaluateResume({ ...evidence, text: lines.join("\n"), lines, headings: ["EDUCATION"], bullets: [] });
     expect(audit.parameters[6].criteria[1]).toMatchObject({ status: "followed" });
   });
+
+  it("names the exact detected formatting and missing education evidence", () => {
+    const lines = ["Aarav Sharma", "EDUCATION", "Bachelor of Technology, 2026"];
+    const audit = evaluateResume({
+      ...evidence,
+      text: lines.join("\n"),
+      lines,
+      formatting: { ...evidence.formatting, hasBorders: true, usesNonStandardColors: true },
+    });
+    expect(audit.parameters[1].criteria[6]).toMatchObject({ status: "not_followed" });
+    expect(audit.parameters[1].criteria[6].evidence).toBe("Detected prohibited formatting: borders, non-standard colors.");
+    expect(audit.parameters[6].criteria[1].evidence).toMatch(/board\/university affiliation/);
+  });
+
+  it("does not award a heading check when the resume has no headings", () => {
+    const audit = evaluateResume({ ...evidence, headings: [], headingCandidates: [], lines: ["Aarav Sharma", "Resume content"], text: "Aarav Sharma\nResume content" });
+    expect(audit.parameters[4].criteria.map((criterion) => criterion.status)).toEqual(["not_followed", "not_followed", "not_followed"]);
+    expect(audit.parameters[4].awardedScore).toBe(0);
+    expect(audit.parameters[1].criteria[4]).toMatchObject({ status: "not_followed" });
+    expect(audit.parameters[2].criteria.map((criterion) => criterion.status)).toEqual(["not_followed", "not_followed", "not_followed"]);
+  });
 });

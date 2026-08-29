@@ -13,6 +13,7 @@ describe("resume extraction", () => {
     expect(evidence.fileType).toBe("txt");
     expect(evidence.lines[0]).toBe("Aarav Sharma");
     expect(evidence.headings).toEqual(["EDUCATION"]);
+    expect(evidence.headingCandidates).toEqual(["EDUCATION"]);
     expect(evidence.bullets).toHaveLength(1);
     expect(evidence.hyperlinks).toContain("https://example.com");
     expect(evidence.embeddedHyperlinks).toEqual([]);
@@ -71,5 +72,15 @@ describe("resume extraction", () => {
     expect(audit.parameters[8].awardedScore).toBeGreaterThan(0);
     expect(audit.parameters[10].criteria[4].evidence).not.toMatch(/No auditable work bullets/i);
     expect(audit.parameters[11].criteria.some((criterion) => criterion.status === "followed")).toBe(true);
+  });
+
+  it("retains non-standard uppercase section headings for rubric review", async () => {
+    const file = new File(["Aarav Sharma\nEDUCATION\nBachelor of Technology\nMY JOURNEY\nBuilt several applications."], "headings.txt", { type: "text/plain" });
+    const extracted = await extractResume(file);
+    expect(extracted.headings).toEqual(["EDUCATION"]);
+    expect(extracted.headingCandidates).toEqual(["EDUCATION", "MY JOURNEY"]);
+    const audit = evaluateResume(extracted);
+    expect(audit.parameters[4].criteria[0]).toMatchObject({ status: "not_followed" });
+    expect(audit.parameters[4].criteria[0].evidence).toMatch(/MY JOURNEY/);
   });
 });

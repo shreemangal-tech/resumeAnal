@@ -116,21 +116,23 @@ export const parameterEvaluators: ParameterEvaluator[] = [
     const f = evidence.formatting;
     const knownLayout = [f.hasTables, f.hasTextBoxes, f.hasColumns];
     const layoutValue = !knownLayout.some((value) => value === true) && f.hasImages !== true;
+    const detectedLayout = [f.hasTables === true && "table", f.hasTextBoxes === true && "text box", f.hasColumns === true && "multi-column layout", f.hasImages === true && "embedded image"].filter(Boolean).join(", ");
     const fontValue = f.fontFamilies === null || f.fontFamilies.length <= 1;
     const marginValue = f.marginsInches === null || f.marginsInches.every((margin) => margin >= 0.5 && margin <= 1);
     const bodyFontValue = !f.bodyFontSizes?.length || f.bodyFontSizes.every((size) => size >= 10 && size <= 12);
     const headingStyles = evidence.headings.map((heading) => heading === heading.toUpperCase() ? "uppercase" : "mixed-case");
-    const consistentHeadingStyle = new Set(headingStyles).size <= 1;
+    const consistentHeadingStyle = headingStyles.length > 0 && new Set(headingStyles).size === 1;
     const prohibitedDecoration = [f.hasBorders, f.hasShading, f.usesNonStandardColors];
     const decorationValue = !prohibitedDecoration.some((value) => value === true);
+    const detectedDecoration = [f.hasBorders === true && "borders", f.hasShading === true && "shading", f.usesNonStandardColors === true && "non-standard colors"].filter(Boolean).join(", ");
     return [
-      assessment(criteria[0], layoutValue, "No table, text box, column, or embedded layout image was detected.", "A table, text box, column, or embedded image was detected."),
+      assessment(criteria[0], layoutValue, "No table, text box, column, or embedded layout image was detected.", `Detected prohibited layout elements: ${detectedLayout}.`),
       assessment(criteria[1], fontValue, f.fontFamilies?.length ? `Exactly one font family was detected: ${f.fontFamilies[0]}.` : "No conflicting font family was detected.", `Multiple font families were detected: ${f.fontFamilies?.join(", ")}.`),
       assessment(criteria[2], marginValue, f.marginsInches ? `All detected margins are within 0.5–1 inch: ${f.marginsInches.join(", ")}.` : "No margin outside the required 0.5–1 inch range was detected.", `Detected margins fall outside 0.5–1 inch: ${f.marginsInches?.join(", ")}.`),
       assessment(criteria[3], bodyFontValue, f.bodyFontSizes?.length ? `Dominant body font sizes are within 10–12 pt: ${f.bodyFontSizes.join(", ")}.` : "No body font size outside 10–12 pt was detected.", `Dominant body font sizes fall outside 10–12 pt: ${f.bodyFontSizes?.join(", ")}.`),
-      assessment(criteria[4], consistentHeadingStyle, "Detected section headings use one consistent capitalization pattern.", "Section headings mix capitalization patterns for the same purpose."),
+      assessment(criteria[4], consistentHeadingStyle, "Detected section headings use one consistent capitalization pattern.", headingStyles.length ? "Section headings mix capitalization patterns for the same purpose." : "No section headings were available for the required consistency check."),
       assessment(criteria[5], listUsesBullets(evidence), "Detected list entries use bullet markers; project titles and technology labels were excluded from the list check.", "A multi-entry work or project section was detected without bullet markers."),
-      assessment(criteria[6], decorationValue, "No borders, shading, or non-standard text colors were detected.", "Borders, shading, or non-standard text colors were detected."),
+      assessment(criteria[6], decorationValue, "No borders, shading, or non-standard text colors were detected.", `Detected prohibited formatting: ${detectedDecoration}.`),
     ];
   },
   (evidence, criteria) => {
@@ -138,7 +140,7 @@ export const parameterEvaluators: ParameterEvaluator[] = [
     return [
       assessment(criteria[0], evidence.headings.length > 0, `Detected section headings: ${evidence.headings.join(", ")}.`, "No distinct labeled section heading was detected."),
       assessment(criteria[1], chronology.value, chronology.detail, chronology.detail),
-      assessment(criteria[2], evidence.headings.every((heading) => (sectionLines(evidence, [heading]) ?? []).length > 0), "Every detected heading contains its own entries; no orphaned or miscategorized entry was detected.", "At least one detected heading has no correctly categorized content."),
+      assessment(criteria[2], evidence.headings.length > 0 && evidence.headings.every((heading) => (sectionLines(evidence, [heading]) ?? []).length > 0), "Every detected heading contains its own entries; no orphaned or miscategorized entry was detected.", evidence.headings.length ? "At least one detected heading has no correctly categorized content." : "No labeled sections were available to verify that entries are correctly categorized."),
     ];
   },
   (evidence, criteria) => {
@@ -159,13 +161,18 @@ export const parameterEvaluators: ParameterEvaluator[] = [
     ];
   },
   (evidence, criteria) => {
+    const candidates = evidence.headingCandidates ?? evidence.headings;
+    const standardHeadings = new Set(evidence.headings.map(normalize));
+    const unrecognizedHeadings = candidates.filter((heading) => !standardHeadings.has(normalize(heading)));
     const emptyHeading = evidence.headings.find((heading) => (sectionLines(evidence, [heading]) ?? []).length === 0);
     return [
-      assessment(criteria[0], evidence.headings.length > 0, `Detected standard headings: ${evidence.headings.join(", ")}.`, "No standard industry-recognized section heading was detected."),
-      emptyHeading
-        ? result(criteria[1], "not_followed", `The heading “${emptyHeading}” is not followed by content.`)
-        : result(criteria[1], "followed", "Every detected heading is immediately followed by content belonging to that section."),
-      assessment(criteria[2], evidence.headings.length > 0, "All detected section content is placed under a recognized heading; no required heading is missing.", "Required section headings are missing."),
+      assessment(criteria[0], candidates.length > 0 && unrecognizedHeadings.length === 0, `Every detected section heading uses a standard label: ${evidence.headings.join(", ")}.`, unrecognizedHeadings.length ? `Non-standard section headings detected: ${unrecognizedHeadings.join(", ")}.` : "No standard industry-recognized section heading was detected."),
+      candidates.length === 0
+        ? result(criteria[1], "not_followed", "No section heading was detected, so heading-to-content relevance could not be established.")
+        : emptyHeading
+          ? result(criteria[1], "not_followed", `The heading “${emptyHeading}” is not followed by content.`)
+          : result(criteria[1], "followed", "Every detected heading is immediately followed by content belonging to that section."),
+      assessment(criteria[2], evidence.headings.length > 0 && unrecognizedHeadings.length === 0, "All detected section content is placed under a recognized heading; no required heading is missing.", unrecognizedHeadings.length ? `Content uses non-standard headings instead of required recognized labels: ${unrecognizedHeadings.join(", ")}.` : "Required section headings are missing."),
     ];
   },
   (evidence, criteria) => {
@@ -196,18 +203,23 @@ export const parameterEvaluators: ParameterEvaluator[] = [
       else groups[groups.length - 1].push(line);
       return groups;
     }, []).filter((entry) => entry.some((line) => entryStart.test(line)));
-    const completeEntries = entries.length > 0 && entries.every((entry) => {
+    const entryChecks = entries.map((entry, index) => {
       const entryText = entry.join(" ");
-      return /\b(?:school|college|university|institute|academy)\b/i.test(entryText)
-        && /\b(?:board|university|cbse|icse|isc|state board)\b/i.test(entryText)
-        && /\b(?:19|20)\d{2}\b/.test(entryText)
-        && /(?:\b(?:cgpa|gpa|percentage)\b|\b\d{1,3}(?:\.\d+)?%)/i.test(entryText);
+      const missing = [
+        !/\b(?:school|college|university|institute|academy)\b/i.test(entryText) && "institution",
+        !/\b(?:board|university|cbse|icse|isc|state board)\b/i.test(entryText) && "board/university affiliation",
+        !/\b(?:19|20)\d{2}\b/.test(entryText) && "passing/expected year",
+        !/(?:\b(?:cgpa|gpa|percentage)\b|\b\d{1,3}(?:\.\d+)?%)/i.test(entryText) && "CGPA/percentage",
+      ].filter(Boolean);
+      return { label: entry[0]?.slice(0, 100) || `Education entry ${index + 1}`, missing };
     });
+    const completeEntries = entryChecks.length > 0 && entryChecks.every((entry) => entry.missing.length === 0);
+    const incompleteEducation = entryChecks.filter((entry) => entry.missing.length > 0).map((entry) => `“${entry.label}” is missing ${entry.missing.join(", ")}`).join("; ");
     const abbreviation = text.match(/\b(?:b\.?tech|m\.?tech|b\.?sc|m\.?sc|bca|mca)\b/i)?.[0];
     const spelledOut = /\b(?:bachelor|master)\b/i.test(text);
     return [
       assessment(criteria[0], !wrongTerm, "The required Secondary/Senior Secondary terminology is used; no prohibited school-level term was found.", "Education uses 10th/12th, +1/+2, or Roman-numeral terminology."),
-      assessment(criteria[1], completeEntries, "Every detected education entry includes institution, affiliation, year, and CGPA/percentage.", "At least one education entry is missing an institution, affiliation, year, or CGPA/percentage."),
+      assessment(criteria[1], completeEntries, "Every detected education entry includes institution, affiliation, year, and CGPA/percentage.", incompleteEducation || "No complete education entry was detected."),
       assessment(criteria[2], !abbreviation || spelledOut, abbreviation ? `The degree name is spelled out in addition to “${abbreviation}”.` : "No abbreviation-only degree name was detected.", `The degree abbreviation “${abbreviation}” appears without a fully spelled-out degree name.`),
     ];
   },

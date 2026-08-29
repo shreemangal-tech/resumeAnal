@@ -25,6 +25,7 @@ export type ResumeEvidence = {
   hyperlinks: string[];
   embeddedHyperlinks: string[];
   headings: string[];
+  headingCandidates?: string[];
   bullets: string[];
   formatting: {
     fontFamilies: string[] | null;

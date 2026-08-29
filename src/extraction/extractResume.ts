@@ -13,6 +13,13 @@ const headingLabels = new Set([
 const normalizeHeading = (line: string) => line.toLowerCase().replace(/[^a-z\s]/g, " ").replace(/\s+/g, " ").trim();
 const cleanLines = (text: string) => text.split(/\r?\n/).map((line) => line.replace(/\s+/g, " ").trim()).filter(Boolean);
 
+function looksLikeSectionHeading(line: string): boolean {
+  if (line.length > 80 || /@|https?:|www\.|\b(?:19|20)\d{2}\b/.test(line)) return false;
+  const letters = line.replace(/[^A-Za-z]/g, "");
+  const words = line.match(/[A-Za-z]+/g) ?? [];
+  return letters.length >= 3 && words.length <= 8 && letters === letters.toUpperCase();
+}
+
 type ExtractedFile = {
   text: string;
   pageCount: number | null;
@@ -59,7 +66,7 @@ async function extractPdf(file: File): Promise<ExtractedFile> {
   const fontSizes: number[] = [];
   const hyperlinks: string[] = [];
   let imageCount = 0;
-  let vectorStrokeCount = 0;
+  let vectorShapeCount = 0;
   let shadingCount = 0;
   let usesNonStandardColors = false;
   let firstLineSize: number | null = null;
@@ -94,7 +101,16 @@ async function extractPdf(file: File): Promise<ExtractedFile> {
     }
     const operators = await page.getOperatorList();
     imageCount += operators.fnArray.filter((operator) => [pdfjs.OPS.paintImageXObject, pdfjs.OPS.paintInlineImageXObject, pdfjs.OPS.paintImageMaskXObject].includes(operator)).length;
-    vectorStrokeCount += operators.fnArray.filter((operator) => [pdfjs.OPS.stroke, pdfjs.OPS.closeStroke, pdfjs.OPS.fillStroke, pdfjs.OPS.eoFillStroke, pdfjs.OPS.closeFillStroke, pdfjs.OPS.closeEOFillStroke].includes(operator)).length;
+    vectorShapeCount += operators.fnArray.filter((operator) => [
+      pdfjs.OPS.stroke,
+      pdfjs.OPS.closeStroke,
+      pdfjs.OPS.fill,
+      pdfjs.OPS.eoFill,
+      pdfjs.OPS.fillStroke,
+      pdfjs.OPS.eoFillStroke,
+      pdfjs.OPS.closeFillStroke,
+      pdfjs.OPS.closeEOFillStroke,
+    ].includes(operator)).length;
     shadingCount += operators.fnArray.filter((operator) => operator === pdfjs.OPS.shadingFill).length;
     operators.fnArray.forEach((operator, index) => {
       if (![pdfjs.OPS.setFillRGBColor, pdfjs.OPS.setStrokeRGBColor].includes(operator)) return;
@@ -130,7 +146,7 @@ async function extractPdf(file: File): Promise<ExtractedFile> {
       // bounds include headers/footers and must not be reported as page margins.
       marginsInches: null,
       hasImages: imageCount > 0,
-      hasBorders: vectorStrokeCount > 0,
+      hasBorders: vectorShapeCount > 0,
       hasShading: shadingCount > 0,
       usesNonStandardColors,
       nameEmphasized: firstLineSize !== null && medianSize !== null ? firstLineSize >= medianSize * 1.2 : null,
@@ -220,6 +236,9 @@ export async function extractResume(file: File): Promise<ResumeEvidence> {
 
   const lines = cleanLines(extracted.text);
   const headings = lines.filter((line) => headingLabels.has(normalizeHeading(line)));
+  const firstKnownHeadingIndex = lines.findIndex((line) => headingLabels.has(normalizeHeading(line)));
+  const headingCandidateStart = firstKnownHeadingIndex >= 0 ? firstKnownHeadingIndex : Math.min(2, lines.length);
+  const headingCandidates = lines.filter((line, index) => headingLabels.has(normalizeHeading(line)) || (index >= headingCandidateStart && looksLikeSectionHeading(line)));
   const textHyperlinks = extracted.text.match(/https?:\/\/\S+|(?:www\.)\S+|linkedin\.com\/\S+/gi) ?? [];
   const bullets = lines.filter((line) => /^[•●▪◦\-*]\s+/.test(line));
 
@@ -232,6 +251,7 @@ export async function extractResume(file: File): Promise<ResumeEvidence> {
     hyperlinks: unique([...extracted.hyperlinks, ...textHyperlinks]),
     embeddedHyperlinks: extracted.hyperlinks,
     headings,
+    headingCandidates: unique(headingCandidates),
     bullets,
     formatting: extracted.formatting,
   };
