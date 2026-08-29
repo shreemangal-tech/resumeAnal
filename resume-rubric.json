@@ -1,0 +1,230 @@
+{
+  "source_workbook": "Parameters_SOURCE.xlsx",
+  "source_sheets_used_for_resume_site": [
+    "Resume",
+    "Requirements"
+  ],
+  "source_sheet_not_part_of_resume_site": {
+    "sheet": "Writing",
+    "reason": "The current product request is a resume audit website. The Writing sheet is a separate 'RUBRICS- WRITEX (10)' rubric."
+  },
+  "maximum_total_score": 39,
+  "display_order": [
+    "Visual Appeal (3)",
+    "Formatting (ATS) (3)",
+    "Organisation of Data (3)",
+    "Personal Information (3)",
+    "Headings (3)",
+    "Career Objective (3)",
+    "Education (3)",
+    "Extra-Curricular/ Academic Activities(3)",
+    "Interpersonal Skills (3)",
+    "Interests/ Hobbies (3)",
+    "Grammatical Accuracy and Punctuation (3)",
+    "Trainings and Projects (6)"
+  ],
+  "requirements_exact": [
+    "Marks must be in horizontal format only as given above",
+    "Strict marking must be there",
+    "Proper feedback, where marks are being deducted, must be there ",
+    "Proper audit must be done as per the parameters",
+    "It should not look like that AI has audited it must be having human version",
+    "After my audit it will be re-audited that I has checked in proper way or not by the quality team, so no room for errors",
+    "Copy paste button must be there at every parameters",
+    "No unnecessary marking will be there because students may check the resumes on AI also so proper feedback must be there"
+  ],
+  "parameters": [
+    {
+      "sr_no": 1,
+      "parameter": "Visual Appeal",
+      "scores": {
+        "highly_satisfactory": 3,
+        "satisfactory": 2,
+        "average": 1,
+        "dissatisfactory": 0
+      },
+      "criteria": {
+        "highly_satisfactory": "ALL of the following are true, with zero exceptions:\n• Fits exactly one page.\n• No overcrowding (visible white space between sections).\n• Any photo used is professional, square-cropped, and passport-style.(not mandatory)\n• Font/spacing is uniform across every section.\n• No dark shaded blocks or uneven margins.\n• The most job-relevant tagline with name/job-role/ Qualification e.g. (Sophomore Developer/Aspiring Tech Enthusiast)",
+        "satisfactory": "Any one or two of the points mentioned in the “Highly Satisfactory” category were not followed.",
+        "average": "Any three or four of the points mentioned in the “Highly Satisfactory” category were not followed.",
+        "dissatisfactory": "None of the points mentioned in the “Highly Satisfactory” category were followed."
+      }
+    },
+    {
+      "sr_no": 2,
+      "parameter": "Formatting (ATS)",
+      "scores": {
+        "highly_satisfactory": 3,
+        "satisfactory": 2,
+        "average": 1,
+        "dissatisfactory": 0
+      },
+      "criteria": {
+        "highly_satisfactory": "ALL of the following:\n• No tables, text boxes, columns, or embedded images used for layout.\n• Exactly one font family throughout.\n• Margins between 0.5\"–1\" on all sides.\n• Font size 10–12pt for body text and consistent within each section.\n• Special characters/bold/caps used consistently for the same purpose throughout (e.g., all section headers bold, never mixed).\n• Bullets used for every list, no paragraph-style lists.\n• No borders, shading, or non-standard colors.",
+        "satisfactory": "Any one or two of the points mentioned in the “Highly Satisfactory” category were not followed.",
+        "average": "Any three or four of the points mentioned in the “Highly Satisfactory” category were not followed.",
+        "dissatisfactory": "Any five or none of the points mentioned in the “Highly Satisfactory” category were followed."
+      }
+    },
+    {
+      "sr_no": 3,
+      "parameter": "Organisation of Data",
+      "scores": {
+        "highly_satisfactory": 3,
+        "satisfactory": 2,
+        "average": 1,
+        "dissatisfactory": 0
+      },
+      "criteria": {
+        "highly_satisfactory": "ALL of the following:\n• Every section has a distinct, labeled heading.\n• All entries within each section (Education, Projects, Experience, Achievements, Certifications, Trainings or any academic activity) are in strict reverse chronological order with no exceptions.\n• No orphaned or miscategorized entries.",
+        "satisfactory": "Any one of the points mentioned in the “Highly Satisfactory” category was not followed.",
+        "average": "Any two of the points mentioned in the “Highly Satisfactory” category were not followed.",
+        "dissatisfactory": "None of the points mentioned in the “Highly Satisfactory” category followed."
+      }
+    },
+    {
+      "sr_no": 4,
+      "parameter": "Personal Details",
+      "scores": {
+        "highly_satisfactory": 3,
+        "satisfactory": 2,
+        "average": 1,
+        "dissatisfactory": 0
+      },
+      "criteria": {
+        "highly_satisfactory": "ALL of the following present and correctly formatted:\n• Full name (largest/boldest text on the page). The name added should stand out in the resume.\n• Contact Details: Phone number,LinkedIn Username hyperlinked with URL and other portfolios/website links.\n• Professional email (firstname.lastname format or similar — no nicknames/numbers unrelated to name). ",
+        "satisfactory": "Any one of the points mentioned in the “Highly Satisfactory” category was not followed.",
+        "average": "Any two of the points mentioned in the “Highly Satisfactory” category were not followed.",
+        "dissatisfactory": "None of the points mentioned in the “Highly Satisfactory” category followed."
+      }
+    },
+    {
+      "sr_no": 5,
+      "parameter": "Headings",
+      "scores": {
+        "highly_satisfactory": 3,
+        "satisfactory": 2,
+        "average": 1,
+        "dissatisfactory": 0
+      },
+      "criteria": {
+        "highly_satisfactory": "• ALL section headings use standard, industry-recognized labels (Education, Experience, Projects, Skills, Certifications, Activities).\n• Every heading is immediately followed by directly relevant content with zero mismatched entries.\n• No heading is missing that the content requires.",
+        "satisfactory": "Any one of the points mentioned in the “Highly Satisfactory” category was not followed.",
+        "average": "Any two of the points mentioned in the “Highly Satisfactory” category were not followed.",
+        "dissatisfactory": "None of the points mentioned in the “Highly Satisfactory” category followed."
+      }
+    },
+    {
+      "sr_no": 6,
+      "parameter": "Career Objective",
+      "scores": {
+        "highly_satisfactory": 3,
+        "satisfactory": 2,
+        "average": 1,
+        "dissatisfactory": 0
+      },
+      "criteria": {
+        "highly_satisfactory": "ALL of the following:\n• Objective is 2–3 sentences (not 1 line, not a full paragraph).\n• Explicitly names the target role/domain.\n• States one specific skill or strength the student brings.\n• Is written in the student's own words with zero generic/templated phrases (\"seeking a challenging position,\" \"to utilize my skills,\" \"hardworking and dedicated individual\" are automatic disqualifiers from this band). Trainer must have reviewed against the actual target JD.",
+        "satisfactory": "Any one of the points mentioned in the “Highly Satisfactory” category was not followed.",
+        "average": "Any two-three of the points mentioned in the “Highly Satisfactory” category were not followed.",
+        "dissatisfactory": "None of the points mentioned in the “Highly Satisfactory” category followed."
+      }
+    },
+    {
+      "sr_no": 7,
+      "parameter": "Education",
+      "scores": {
+        "highly_satisfactory": 3,
+        "satisfactory": 2,
+        "average": 1,
+        "dissatisfactory": 0
+      },
+      "criteria": {
+        "highly_satisfactory": "ALL of the following for every entry:\n• Usage of right terminology as secondary/senior secondary instead of roman numbers or 10th, +1, +2.\n• Institution name, board/university affiliation, year of passing/expected, and CGPA/percentage all present for every entry with zero omissions.\n• Degree names fully spelled out (not abbreviated as \"B.Tech\" without full form at least once).",
+        "satisfactory": "Any one of the points mentioned in the “Highly Satisfactory” category was not followed.",
+        "average": "Any two of the points mentioned in the “Highly Satisfactory” category were not followed.",
+        "dissatisfactory": "None of the points mentioned in the “Highly Satisfactory” category followed."
+      }
+    },
+    {
+      "sr_no": 8,
+      "parameter": "Extra-Curricular/ Academic Activities",
+      "scores": {
+        "highly_satisfactory": 3,
+        "satisfactory": 2,
+        "average": 1,
+        "dissatisfactory": 0
+      },
+      "criteria": {
+        "highly_satisfactory": "• Extra-curricular/academic activities (lists clubs, events, or volunteer work where you played an active part, showing you are involved beyond the classroom) relevant to education pursued or interest/hobbies mentioned are stated. \n• The achievements are highlighted with a mention of activity and level of achievement. \n• Most important achievements are listed at the beginning of the description of this section.\n• The impact of the student's work is highlighted through clear results or meaningful achievements.",
+        "satisfactory": "Any one of the points mentioned in the “Highly Satisfactory” category was not followed.",
+        "average": "Any two of the points mentioned in the “Highly Satisfactory” category were not followed.",
+        "dissatisfactory": "None of the points mentioned in the “Highly Satisfactory” category followed."
+      }
+    },
+    {
+      "sr_no": 9,
+      "parameter": "Interpersonal Skills",
+      "scores": {
+        "highly_satisfactory": 3,
+        "satisfactory": 2,
+        "average": 1,
+        "dissatisfactory": 0
+      },
+      "criteria": {
+        "highly_satisfactory": "• Interpersonal Skills mentioned are a depiction of unique personality. (for example, effective communication and not communication)\n• The list is organized by category (e.g., Technical, Languages, Interpersonal Skills) for easy reading. It focuses only on relevant, honest skills and avoids over-crowding.\n• The resume avoids simply listing abstract soft skills like \"Leadership\" or \"Communication.\"\n• Every major skill claimed is backed by a specific example or a brief accomplishment.\n• The descriptions demonstrate how skills were applied in real-world scenarios (e.g., in a classroom, project, or club).\n• Evidence provided is concise and directly supports the student's competence in that area.",
+        "satisfactory": "Any one of the points mentioned in the “Highly Satisfactory” category was not followed.",
+        "average": "Any two of the points mentioned in the “Highly Satisfactory” category were not followed.",
+        "dissatisfactory": "None of the points mentioned in the “Highly Satisfactory” category was followed."
+      }
+    },
+    {
+      "sr_no": 10,
+      "parameter": "Interests/Hobbies",
+      "scores": {
+        "highly_satisfactory": 3,
+        "satisfactory": 2,
+        "average": 1,
+        "dissatisfactory": 0
+      },
+      "criteria": {
+        "highly_satisfactory": "• Clearly states 3-4 specific and meaningful interests rather than generic hobbies.\n• Reflects genuine interests that the candidate can confidently discuss.\n• Shows sustained involvement or engagement in the mentioned hobbies.\n• Highlights qualities or transferable skills such as agility, flexibility, creativity and et cetera.\n• Is concise, relevant, well-written, and adds value to the overall resume.",
+        "satisfactory": "Any one of the points mentioned in the “Highly Satisfactory” category was not followed.",
+        "average": "Any two of the points mentioned in the “Highly Satisfactory” category were not followed.",
+        "dissatisfactory": "None of the points mentioned in the “Highly Satisfactory” category was followed."
+      }
+    },
+    {
+      "sr_no": 11,
+      "parameter": "Grammatical Accuracy and Punctuation",
+      "scores": {
+        "highly_satisfactory": 3,
+        "satisfactory": 2,
+        "average": 1,
+        "dissatisfactory": 0
+      },
+      "criteria": {
+        "highly_satisfactory": "• ZERO spelling errors and ZERO grammatical errors anywhere in the document.\n• Tense is consistent within each bullet (past tense for completed work, present for ongoing).\n• No informal words (\"stuff,\" \"a lot,\" \"good\") anywhere.\n• At least 3 industry/JD keywords naturally integrated.\n• Every bullet describing work uses a strong action verb and states impact/result, not just task description.",
+        "satisfactory": "Any one or two of the points mentioned in the “Highly Satisfactory” category was not followed.",
+        "average": "Any three or four of the points mentioned in the “Highly Satisfactory” category were not followed.",
+        "dissatisfactory": "None of the points mentioned in the “Highly Satisfactory” category  was followed.."
+      }
+    },
+    {
+      "sr_no": 12,
+      "parameter": "Trainings and Projects",
+      "scores": {
+        "highly_satisfactory": 6,
+        "satisfactory": 4,
+        "average": 2,
+        "dissatisfactory": 0
+      },
+      "criteria": {
+        "highly_satisfactory": "ALL of the following for every entry:\n• The time order must be consistent, e.g. Month,Year/Year.\n• Duration stated for every entry.\n• Role played, technology/specialization area, and a specific learning or outcome all stated for every entry.\n• At least one entry includes a quantifiable result (e.g., a percentage, metric, or scale) where applicable to the project type.",
+        "satisfactory": "Any one or two of the points mentioned in the “Highly Satisfactory” category was not followed.",
+        "average": "Any three of the points mentioned in the “Highly Satisfactory” category were not followed.",
+        "dissatisfactory": "None of the points mentioned in the “Highly Satisfactory” category was followed.."
+      }
+    }
+  ]
+}

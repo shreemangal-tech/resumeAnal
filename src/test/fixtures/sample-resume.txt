@@ -1,0 +1,21 @@
+Aarav Sharma
+Aspiring Software Developer
++91 98765 43210
+aarav.sharma@example.com
+https://linkedin.com/in/aarav-sharma
+
+CAREER OBJECTIVE
+Aspiring software developer focused on accessible web applications. I bring practical TypeScript experience from academic projects.
+
+EDUCATION
+Bachelor of Technology in Computer Science, Example University, 2026, CGPA 8.5
+Senior Secondary, Example School, CBSE, 2022, 89%
+
+PROJECTS
+• Built a campus portal using React and TypeScript, serving 300 students — January 2026, 3 months
+
+SKILLS
+Technical: TypeScript, React, Git
+
+INTERESTS
+Open-source contribution, distance running, technical writing
