@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import App from "./App";
+import { excelMarksAndCommentsText } from "./components/ScoreStrip";
 import type { AuditResult, ResumeEvidence } from "./domain/types";
 import { evaluateResume } from "./evaluation/evaluateResume";
 import { extractResume } from "./extraction/extractResume";
@@ -58,7 +59,7 @@ const result: AuditResult = {
     displayName: `${parameter} (${index === 11 ? 6 : 3})`,
     maxScore: index === 11 ? 6 : 3,
     awardedScore: 0,
-    criteria: [],
+    criteria: index === 0 ? [{ criterionText: "Fits exactly one page.", status: "not_followed" as const }] : [],
     feedback: [],
   })),
 };
@@ -86,12 +87,23 @@ describe("resume audit workflow", () => {
     expect(extractResume).toHaveBeenCalledWith(file, expect.any(Function));
     expect(evaluateResume).toHaveBeenCalledWith(evidence);
     expect(screen.getAllByRole("article")).toHaveLength(12);
-    expect(screen.getAllByRole("button", { name: "Copy audit" })).toHaveLength(12);
-    expect(screen.getByRole("complementary", { name: "How workbook marking works" })).toHaveTextContent("Marks and source checks are different");
+    expect(screen.getByRole("button", { name: "Copy marks + comments for Excel" })).toBeInTheDocument();
+    expect(screen.getAllByRole("button", { name: /Copy .* mark 0/ })).toHaveLength(24);
+    expect(screen.getAllByText("Fits exactly one page.").length).toBeGreaterThan(0);
+    expect(screen.queryByText(/Source checks/)).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "Audit another resume" }));
     expect(screen.getByRole("heading", { name: "Upload your resume" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Start strict audit/ })).toBeDisabled();
+  });
+
+  it("copies marks and exact failed rubric comments in Excel-aligned rows", () => {
+    const text = excelMarksAndCommentsText(result.parameters);
+    const [marksRow, commentsRow] = text.split("\n");
+    expect(marksRow.split("\t")).toHaveLength(12);
+    expect(commentsRow.split("\t")).toHaveLength(12);
+    expect(commentsRow.split("\t")[0]).toBe("Fits exactly one page.");
+    expect(commentsRow.split("\t")[1]).toBe("");
   });
 
   it("rejects unsupported drops and recovers visibly from extraction errors", async () => {
