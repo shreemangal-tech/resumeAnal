@@ -1,0 +1,141 @@
+.score-strip-toolbar {
+  align-items: flex-start;
+}
+
+.score-strip-help {
+  max-width: 520px;
+}
+
+.score-cell {
+  min-height: 150px;
+}
+
+.score-copy-wrap {
+  position: relative;
+  margin-top: auto;
+}
+
+.score-mark-button,
+.card-score-button {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: inherit;
+  text-align: left;
+}
+
+.score-mark-button:focus-visible,
+.card-score-button:focus-visible {
+  outline: 2px solid #477052;
+  outline-offset: 4px;
+}
+
+.score-mark-button:hover .score-mark,
+.card-score-button:hover .card-score {
+  color: #477052;
+}
+
+.score-copy-hint {
+  display: block;
+  margin-top: 4px;
+  color: #777f79;
+  font-family: "DM Mono", monospace;
+  font-size: 9px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.score-comment-tooltip {
+  position: absolute;
+  z-index: 30;
+  left: 0;
+  bottom: calc(100% + 10px);
+  width: min(360px, 80vw);
+  max-height: 260px;
+  overflow-y: auto;
+  padding: 14px 16px;
+  border: 1px solid #bfc5bf;
+  background: #fffefa;
+  box-shadow: 8px 8px 0 rgba(24, 33, 29, .12);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(5px);
+  transition: opacity .15s ease, transform .15s ease, visibility .15s ease;
+  pointer-events: none;
+}
+
+.score-copy-wrap:hover .score-comment-tooltip,
+.score-copy-wrap:focus-within .score-comment-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.score-comment-tooltip strong {
+  display: block;
+  margin: 0 0 8px;
+  color: #18211d;
+  font-family: "DM Mono", monospace;
+  font-size: 10px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.score-comment-tooltip p {
+  margin: 7px 0 0;
+  color: #5b665f;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.card-score-wrap {
+  margin-top: 0;
+  flex: 0 0 auto;
+}
+
+.card-score-button {
+  min-width: 92px;
+  text-align: right;
+}
+
+.card-comment-tooltip {
+  right: 0;
+  left: auto;
+}
+
+.sheet-comments {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid #e1e3df;
+}
+
+.sheet-comments .eyebrow {
+  color: #943e28;
+}
+
+.sheet-comments p {
+  margin: 9px 0 0;
+  color: #56625b;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+@media (max-width: 560px) {
+  .score-strip-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .score-strip-help {
+    text-align: left;
+  }
+
+  .copy-marks-button {
+    width: 100%;
+  }
+
+  .card-comment-tooltip {
+    right: auto;
+    left: 0;
+  }
+}
