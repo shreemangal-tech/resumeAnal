@@ -2,8 +2,8 @@ import type { ParameterResult } from "./types";
 
 /**
  * Returns only failed rubric points that came from the source workbook.
- * Do not add generated explanations or evidence here: this text is used
- * directly in the UI tooltip and Excel cell notes.
+ * Generated evidence, rewritten feedback, band labels, and other app text
+ * are intentionally excluded from UI and Excel deduction comments.
  */
 export function deductionComments(parameter: ParameterResult): string[] {
   return parameter.criteria
