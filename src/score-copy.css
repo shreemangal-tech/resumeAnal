@@ -1,9 +1,11 @@
 .score-strip-toolbar {
   align-items: flex-start;
+  flex-wrap: wrap;
 }
 
 .score-strip-help {
   max-width: 520px;
+  margin-right: auto;
 }
 
 .score-cell {
@@ -71,21 +73,15 @@
   transform: translateY(0);
 }
 
-.score-comment-tooltip strong {
-  display: block;
-  margin: 0 0 8px;
-  color: #18211d;
-  font-family: "DM Mono", monospace;
-  font-size: 10px;
-  letter-spacing: .06em;
-  text-transform: uppercase;
-}
-
 .score-comment-tooltip p {
-  margin: 7px 0 0;
+  margin: 0 0 8px;
   color: #5b665f;
   font-size: 12px;
   line-height: 1.5;
+}
+
+.score-comment-tooltip p:last-child {
+  margin-bottom: 0;
 }
 
 .card-score-wrap {
@@ -103,23 +99,6 @@
   left: auto;
 }
 
-.sheet-comments {
-  margin-top: 22px;
-  padding-top: 18px;
-  border-top: 1px solid #e1e3df;
-}
-
-.sheet-comments .eyebrow {
-  color: #943e28;
-}
-
-.sheet-comments p {
-  margin: 9px 0 0;
-  color: #56625b;
-  font-size: 14px;
-  line-height: 1.55;
-}
-
 @media (max-width: 560px) {
   .score-strip-toolbar {
     flex-direction: column;
@@ -128,6 +107,7 @@
 
   .score-strip-help {
     text-align: left;
+    margin-right: 0;
   }
 
   .copy-marks-button {
