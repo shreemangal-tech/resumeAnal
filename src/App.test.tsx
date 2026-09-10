@@ -1,9 +1,11 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { strFromU8, unzipSync } from "fflate";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import App from "./App";
 import { excelMarksAndCommentsText } from "./components/ScoreStrip";
 import type { AuditResult, ResumeEvidence } from "./domain/types";
 import { evaluateResume } from "./evaluation/evaluateResume";
+import { buildAuditExcel } from "./exportAuditExcel";
 import { extractResume } from "./extraction/extractResume";
 
 vi.mock("./extraction/extractResume", () => ({ extractResume: vi.fn() }));
@@ -59,7 +61,7 @@ const result: AuditResult = {
     displayName: `${parameter} (${index === 11 ? 6 : 3})`,
     maxScore: index === 11 ? 6 : 3,
     awardedScore: 0,
-    criteria: index === 0 ? [{ criterionText: "Fits exactly one page.", status: "not_followed" as const }] : [],
+    criteria: index === 0 ? [{ criterionText: "Fits exactly one page.", status: "not_followed" as const, evidence: "Generated evidence must never be exported as a comment." }] : [],
     feedback: [],
   })),
 };
@@ -87,9 +89,11 @@ describe("resume audit workflow", () => {
     expect(extractResume).toHaveBeenCalledWith(file, expect.any(Function));
     expect(evaluateResume).toHaveBeenCalledWith(evidence);
     expect(screen.getAllByRole("article")).toHaveLength(12);
-    expect(screen.getByRole("button", { name: "Copy marks + comments for Excel" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Copy marks + comments as rows" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Download Excel with hover comments" })).toBeInTheDocument();
     expect(screen.getAllByRole("button", { name: /Copy .* mark 0/ })).toHaveLength(24);
     expect(screen.getAllByText("Fits exactly one page.").length).toBeGreaterThan(0);
+    expect(screen.queryByText(/Generated evidence must never be exported/)).not.toBeInTheDocument();
     expect(screen.queryByText(/Source checks/)).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "Audit another resume" }));
@@ -104,6 +108,18 @@ describe("resume audit workflow", () => {
     expect(commentsRow.split("\t")).toHaveLength(12);
     expect(commentsRow.split("\t")[0]).toBe("Fits exactly one page.");
     expect(commentsRow.split("\t")[1]).toBe("");
+    expect(text).not.toContain("Generated evidence must never be exported as a comment.");
+  });
+
+  it("exports native Excel notes containing only failed source-rubric text", () => {
+    const files = unzipSync(buildAuditExcel(result.parameters));
+    const commentsXml = strFromU8(files["xl/comments1.xml"]);
+    const sheetXml = strFromU8(files["xl/worksheets/sheet1.xml"]);
+
+    expect(sheetXml).toContain('<c r="A2"><v>0</v></c>');
+    expect(commentsXml).toContain('comment ref="A2"');
+    expect(commentsXml).toContain("Fits exactly one page.");
+    expect(commentsXml).not.toContain("Generated evidence must never be exported as a comment.");
   });
 
   it("rejects unsupported drops and recovers visibly from extraction errors", async () => {
