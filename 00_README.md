@@ -34,7 +34,8 @@ Deduction comments shown in the app or written as Excel cell notes must use only
 
 - Clicking an individual mark copies only that awarded number.
 - The two-row copy action pastes marks and source-sheet deduction comments into aligned Excel rows.
-- Native Excel hover notes cannot be created through a normal text clipboard paste. Use **Download Excel with hover comments** to create an `.xlsx` file where deducted mark cells contain native Excel notes sourced only from failed rubric points.
+- A normal text clipboard paste cannot create native Excel hover notes. Use **Download Excel with hover comments** to create an `.xlsx` file where deducted mark cells contain native Excel notes sourced only from failed rubric points.
+- Full-mark cells do not receive invented comments.
 
 ## Run the website
 
