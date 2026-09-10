@@ -3,18 +3,8 @@ import { deductionComments } from "../domain/deductionComments";
 import type { ParameterResult } from "../domain/types";
 import { downloadAuditExcel } from "../exportAuditExcel";
 
-const excelCell = (value: string) => value.replace(/\t/g, " ").replace(/\r?\n/g, " ").trim();
-
 export const excelMarksText = (parameters: ParameterResult[]) =>
   parameters.map((parameter) => parameter.awardedScore).join("\t");
-
-export const excelMarksAndCommentsText = (parameters: ParameterResult[]) => {
-  const marks = excelMarksText(parameters);
-  const comments = parameters
-    .map((parameter) => excelCell(deductionComments(parameter).join(" | ")))
-    .join("\t");
-  return `${marks}\n${comments}`;
-};
 
 async function writeClipboard(text: string) {
   try {
@@ -39,7 +29,7 @@ export function ScoreStrip({ parameters }: { parameters: ParameterResult[] }) {
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 
   async function copyForExcel() {
-    const copied = await writeClipboard(excelMarksAndCommentsText(parameters));
+    const copied = await writeClipboard(excelMarksText(parameters));
     setCopyState(copied ? "copied" : "error");
     window.setTimeout(() => setCopyState("idle"), 1400);
   }
@@ -54,9 +44,9 @@ export function ScoreStrip({ parameters }: { parameters: ParameterResult[] }) {
   return (
     <div className="score-strip-region">
       <div className="score-strip-toolbar">
-        <p className="score-strip-help">Click a mark to copy · hover deducted marks for exact sheet comments</p>
+        <p className="score-strip-help">Copy pastes marks only · download Excel to keep exact sheet comments as hover notes</p>
         <button type="button" className="copy-marks-button" onClick={copyForExcel}>
-          {copyState === "copied" ? "Excel rows copied" : copyState === "error" ? "Copy blocked" : "Copy marks + comments as rows"}
+          {copyState === "copied" ? "Excel marks copied" : copyState === "error" ? "Copy blocked" : "Copy marks for Excel"}
         </button>
         <button type="button" className="copy-marks-button" onClick={() => downloadAuditExcel(parameters)}>
           Download Excel with hover comments
