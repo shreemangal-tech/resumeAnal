@@ -28,6 +28,15 @@ If any file conflicts with the original workbook, the original workbook wins.
 
 Do not add any product feature or scoring rule that is not explicitly approved.
 
+Deduction comments shown in the app or written as Excel cell notes must use only failed criterion text from the source rubric. Generated evidence or rewritten explanations must not be used as deduction comments.
+
+## Excel output
+
+- Clicking an individual mark copies only that awarded number.
+- The two-row copy action pastes marks and source-sheet deduction comments into aligned Excel rows.
+- A normal text clipboard paste cannot create native Excel hover notes. Use **Download Excel with hover comments** to create an `.xlsx` file where deducted mark cells contain native Excel notes sourced only from failed rubric points.
+- Full-mark cells do not receive invented comments.
+
 ## Run the website
 
 On Windows, double-click `START_APP.cmd`. Keep the terminal window open while using the site.

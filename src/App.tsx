@@ -103,10 +103,9 @@ export default function App() {
             <div className="total-card"><span>Total</span><strong>{result.awardedTotal}<small>/39</small></strong></div>
             <button type="button" className="secondary-button" onClick={reset}>Audit another resume</button>
           </header>
-          <aside className="score-explainer" aria-label="How workbook marking works">
-            <strong>Marks and source checks are different.</strong>
-            <span>“Maximum 3 marks” is the parameter score. The workbook may list more than three checks; the number not followed selects the 3/2/1/0 band. Trainings and Projects uses 6/4/2/0.</span>
-            {result.extractionMethod === "pdf-ocr" && <span><strong>Scanned PDF:</strong> Text was read with OCR. Font sizes, margins, and exact visual formatting are marked conservatively when the source image cannot prove them.</span>}
+          <aside className="score-explainer" aria-label="How to use the marks">
+            <strong>Marks follow the supplied sheet.</strong>
+            <span>Click any mark to copy its number. Hover a deducted mark to see only the failed source-sheet points. To get those same points as hover notes inside Excel, use “Download Excel with hover comments”.</span>
           </aside>
           <ScoreStrip parameters={result.parameters} />
           <div className="report-heading"><span>Detailed review</span><span>{result.parameters.length} parameters</span></div>
