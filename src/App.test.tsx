@@ -91,7 +91,7 @@ describe("resume audit workflow", () => {
     expect(screen.getAllByRole("article")).toHaveLength(12);
     expect(screen.getByRole("button", { name: "Copy marks + comments as rows" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Download Excel with hover comments" })).toBeInTheDocument();
-    expect(screen.getByRole("complementary", { name: "How to use the marks" })).toHaveTextContent("normal clipboard paste cannot carry Excel notes");
+    expect(screen.getByRole("complementary", { name: "How to use the marks" })).toHaveTextContent("Download Excel with hover comments");
     expect(screen.getAllByRole("button", { name: /Copy .* mark 0/ })).toHaveLength(24);
     expect(screen.getAllByText("Fits exactly one page.").length).toBeGreaterThan(0);
     expect(screen.queryByText(/Generated evidence must never be exported/)).not.toBeInTheDocument();
