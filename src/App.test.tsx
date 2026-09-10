@@ -2,7 +2,7 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { strFromU8, unzipSync } from "fflate";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import App from "./App";
-import { excelMarksAndCommentsText } from "./components/ScoreStrip";
+import { excelMarksText } from "./components/ScoreStrip";
 import type { AuditResult, ResumeEvidence } from "./domain/types";
 import { evaluateResume } from "./evaluation/evaluateResume";
 import { buildAuditExcel } from "./exportAuditExcel";
@@ -89,7 +89,7 @@ describe("resume audit workflow", () => {
     expect(extractResume).toHaveBeenCalledWith(file, expect.any(Function));
     expect(evaluateResume).toHaveBeenCalledWith(evidence);
     expect(screen.getAllByRole("article")).toHaveLength(12);
-    expect(screen.getByRole("button", { name: "Copy marks + comments as rows" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Copy marks for Excel" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Download Excel with hover comments" })).toBeInTheDocument();
     expect(screen.getByRole("complementary", { name: "How to use the marks" })).toHaveTextContent("Download Excel with hover comments");
     expect(screen.getAllByRole("button", { name: /Copy .* mark 0/ })).toHaveLength(24);
@@ -102,13 +102,11 @@ describe("resume audit workflow", () => {
     expect(screen.getByRole("button", { name: /Start strict audit/ })).toBeDisabled();
   });
 
-  it("copies marks and exact failed rubric comments in Excel-aligned rows", () => {
-    const text = excelMarksAndCommentsText(result.parameters);
-    const [marksRow, commentsRow] = text.split("\n");
-    expect(marksRow.split("\t")).toHaveLength(12);
-    expect(commentsRow.split("\t")).toHaveLength(12);
-    expect(commentsRow.split("\t")[0]).toBe("Fits exactly one page.");
-    expect(commentsRow.split("\t")[1]).toBe("");
+  it("copies only one horizontal row of numeric marks for Excel", () => {
+    const text = excelMarksText(result.parameters);
+    expect(text.split("\t")).toHaveLength(12);
+    expect(text).not.toContain("\n");
+    expect(text).not.toContain("Fits exactly one page.");
     expect(text).not.toContain("Generated evidence must never be exported as a comment.");
   });
 
