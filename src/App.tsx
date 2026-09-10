@@ -99,12 +99,16 @@ export default function App() {
       {state === "result" && result && (
         <section className="results-view">
           <header className="results-header">
-            <div><span className="eyebrow">Audit report</span><h1 title={result.sourceFileName}>{readableFileName(result.sourceFileName)}</h1><p>Marked only against the approved Resume Audit parameters.</p></div>
+            <div><span className="eyebrow">Audit report</span><h1 title={result.sourceFileName}>{readableFileName(result.sourceFileName)}</h1><p>Strictly marked against every criterion in the supplied Resume Audit workbook.</p></div>
             <div className="total-card"><span>Total</span><strong>{result.awardedTotal}<small>/39</small></strong></div>
             <button type="button" className="secondary-button" onClick={reset}>Audit another resume</button>
           </header>
+          <aside className="score-explainer" aria-label="How to use the marks">
+            <strong>Marks follow the supplied sheet.</strong>
+            <span>Click any mark to copy its number. Hover a deducted mark to see only the failed source-sheet points. For real Excel hover notes, use “Download Excel with hover comments”; normal clipboard paste cannot carry Excel notes.</span>
+          </aside>
           <ScoreStrip parameters={result.parameters} />
-          <div className="report-heading"><span>Parameter comments</span><span>{result.parameters.length} parameters</span></div>
+          <div className="report-heading"><span>Detailed review</span><span>{result.parameters.length} parameters</span></div>
           <div className="parameter-grid">{result.parameters.map((parameter, index) => <ParameterCard parameter={parameter} index={index} key={parameter.parameter} />)}</div>
         </section>
       )}
