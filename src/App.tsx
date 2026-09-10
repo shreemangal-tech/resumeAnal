@@ -99,17 +99,12 @@ export default function App() {
       {state === "result" && result && (
         <section className="results-view">
           <header className="results-header">
-            <div><span className="eyebrow">Audit report</span><h1 title={result.sourceFileName}>{readableFileName(result.sourceFileName)}</h1><p>Strictly marked against every criterion in the supplied Resume Audit workbook.</p></div>
+            <div><span className="eyebrow">Audit report</span><h1 title={result.sourceFileName}>{readableFileName(result.sourceFileName)}</h1><p>Marked only against the approved Resume Audit parameters.</p></div>
             <div className="total-card"><span>Total</span><strong>{result.awardedTotal}<small>/39</small></strong></div>
             <button type="button" className="secondary-button" onClick={reset}>Audit another resume</button>
           </header>
-          <aside className="score-explainer" aria-label="How workbook marking works">
-            <strong>Marks and source checks are different.</strong>
-            <span>“Maximum 3 marks” is the parameter score. The workbook may list more than three checks; the number not followed selects the 3/2/1/0 band. Trainings and Projects uses 6/4/2/0.</span>
-            {result.extractionMethod === "pdf-ocr" && <span><strong>Scanned PDF:</strong> Text was read with OCR. Font sizes, margins, and exact visual formatting are marked conservatively when the source image cannot prove them.</span>}
-          </aside>
           <ScoreStrip parameters={result.parameters} />
-          <div className="report-heading"><span>Detailed review</span><span>{result.parameters.length} parameters</span></div>
+          <div className="report-heading"><span>Parameter comments</span><span>{result.parameters.length} parameters</span></div>
           <div className="parameter-grid">{result.parameters.map((parameter, index) => <ParameterCard parameter={parameter} index={index} key={parameter.parameter} />)}</div>
         </section>
       )}
