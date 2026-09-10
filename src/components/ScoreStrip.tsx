@@ -1,49 +1,92 @@
 import { useState } from "react";
 import type { ParameterResult } from "../domain/types";
-import { bandSummary } from "../domain/bandSummary";
 
-export const excelMarksText = (parameters: ParameterResult[]) => parameters.map((parameter) => parameter.awardedScore).join("\t");
+const deductionComments = (parameter: ParameterResult) =>
+  parameter.criteria
+    .filter((criterion) => criterion.status === "not_followed")
+    .map((criterion) => criterion.criterionText.trim())
+    .filter(Boolean);
+
+const excelCell = (value: string) => value.replace(/\t/g, " ").replace(/\r?\n/g, " ").trim();
+
+export const excelMarksText = (parameters: ParameterResult[]) =>
+  parameters.map((parameter) => parameter.awardedScore).join("\t");
+
+export const excelMarksAndCommentsText = (parameters: ParameterResult[]) => {
+  const marks = excelMarksText(parameters);
+  const comments = parameters
+    .map((parameter) => excelCell(deductionComments(parameter).join(" | ")))
+    .join("\t");
+  return `${marks}\n${comments}`;
+};
+
+async function writeClipboard(text: string) {
+  try {
+    if (!navigator.clipboard) throw new Error("Clipboard API unavailable");
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch {
+    const textarea = document.createElement("textarea");
+    textarea.value = text;
+    textarea.style.position = "fixed";
+    textarea.style.opacity = "0";
+    document.body.appendChild(textarea);
+    textarea.select();
+    const copied = document.execCommand?.("copy") ?? false;
+    textarea.remove();
+    return copied;
+  }
+}
 
 export function ScoreStrip({ parameters }: { parameters: ParameterResult[] }) {
   const [copyState, setCopyState] = useState<"idle" | "copied" | "error">("idle");
+  const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 
-  async function copyMarks() {
-    const text = excelMarksText(parameters);
-    let copied = false;
-    try {
-      if (!navigator.clipboard) throw new Error("Clipboard API unavailable");
-      await navigator.clipboard.writeText(text);
-      copied = true;
-    } catch {
-      const textarea = document.createElement("textarea");
-      textarea.value = text;
-      textarea.style.position = "fixed";
-      textarea.style.opacity = "0";
-      document.body.appendChild(textarea);
-      textarea.select();
-      copied = document.execCommand?.("copy") ?? false;
-      textarea.remove();
-    }
+  async function copyForExcel() {
+    const copied = await writeClipboard(excelMarksAndCommentsText(parameters));
     setCopyState(copied ? "copied" : "error");
     window.setTimeout(() => setCopyState("idle"), 1400);
+  }
+
+  async function copyMark(parameter: ParameterResult, index: number) {
+    const copied = await writeClipboard(String(parameter.awardedScore));
+    if (!copied) return;
+    setCopiedIndex(index);
+    window.setTimeout(() => setCopiedIndex(null), 1200);
   }
 
   return (
     <div className="score-strip-region">
       <div className="score-strip-toolbar">
-        <p className="score-strip-help">12 parameter marks · scroll horizontally to review</p>
-        <button type="button" className="copy-marks-button" onClick={copyMarks}>{copyState === "copied" ? "Excel values copied" : copyState === "error" ? "Copy blocked" : "Copy values for Excel"}</button>
+        <p className="score-strip-help">Click a mark to copy it · hover a mark to see the deduction comment</p>
+        <button type="button" className="copy-marks-button" onClick={copyForExcel}>
+          {copyState === "copied" ? "Excel rows copied" : copyState === "error" ? "Copy blocked" : "Copy marks + comments for Excel"}
+        </button>
       </div>
       <div className="score-strip" aria-label="Resume audit marks" tabIndex={0}>
         {parameters.map((parameter, index) => {
-          const band = bandSummary(parameter);
-          return <div className="score-cell" key={parameter.displayName}>
-            <span className="score-index">{String(index + 1).padStart(2, "0")}</span>
-            <strong>{parameter.displayName}</strong>
-            <span className="score-maximum">Maximum {parameter.maxScore} marks · {band.total} source checks</span>
-            <span className="score-band">{band.label} · {band.followed}/{band.total} checks followed</span>
-            <span className="score-mark">{parameter.awardedScore}<small>/{parameter.maxScore} marks</small></span>
-          </div>;
+          const comments = deductionComments(parameter);
+          return (
+            <div className="score-cell" key={parameter.displayName}>
+              <span className="score-index">{String(index + 1).padStart(2, "0")}</span>
+              <strong>{parameter.displayName}</strong>
+              <div className="score-copy-wrap">
+                <button
+                  type="button"
+                  className="score-mark-button"
+                  onClick={() => copyMark(parameter, index)}
+                  aria-label={`Copy ${parameter.displayName} mark ${parameter.awardedScore}`}
+                >
+                  <span className="score-mark">{parameter.awardedScore}<small>/{parameter.maxScore}</small></span>
+                  <span className="score-copy-hint">{copiedIndex === index ? "Copied" : "Click to copy"}</span>
+                </button>
+                <div className="score-comment-tooltip" role="tooltip">
+                  <strong>Deduction comment</strong>
+                  {comments.length > 0 ? comments.map((comment) => <p key={comment}>{comment}</p>) : <p>No marks deducted.</p>}
+                </div>
+              </div>
+            </div>
+          );
         })}
       </div>
     </div>
