@@ -105,7 +105,7 @@ export default function App() {
           </header>
           <aside className="score-explainer" aria-label="How to use the marks">
             <strong>Marks follow the supplied sheet.</strong>
-            <span>Click any mark to copy its number. Hover a deducted mark to see only the failed source-sheet points. For real Excel hover notes, use “Download Excel with hover comments”; normal clipboard paste cannot carry Excel notes.</span>
+            <span>Click any mark to copy its number. Hover a deducted mark to see only the failed source-sheet points. To get those same points as hover notes inside Excel, use “Download Excel with hover comments”.</span>
           </aside>
           <ScoreStrip parameters={result.parameters} />
           <div className="report-heading"><span>Detailed review</span><span>{result.parameters.length} parameters</span></div>
