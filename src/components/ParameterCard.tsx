@@ -1,11 +1,6 @@
 import { useState } from "react";
+import { deductionComments } from "../domain/deductionComments";
 import type { ParameterResult } from "../domain/types";
-
-const deductionComments = (parameter: ParameterResult) =>
-  parameter.criteria
-    .filter((criterion) => criterion.status === "not_followed")
-    .map((criterion) => criterion.criterionText.trim())
-    .filter(Boolean);
 
 async function writeClipboard(text: string) {
   try {
@@ -53,19 +48,13 @@ export function ParameterCard({ parameter, index }: { parameter: ParameterResult
             <span className="card-score">{parameter.awardedScore}<small>/{parameter.maxScore}</small></span>
             <span className="score-copy-hint">{copied ? "Copied" : "Click to copy"}</span>
           </button>
-          <div className="score-comment-tooltip card-comment-tooltip" role="tooltip">
-            <strong>Deduction comment</strong>
-            {comments.length > 0 ? comments.map((comment) => <p key={comment}>{comment}</p>) : <p>No marks deducted.</p>}
-          </div>
+          {comments.length > 0 && (
+            <div className="score-comment-tooltip card-comment-tooltip" role="tooltip">
+              {comments.map((comment) => <p key={comment}>{comment}</p>)}
+            </div>
+          )}
         </div>
       </header>
-
-      {comments.length > 0 && (
-        <div className="sheet-comments">
-          <span className="eyebrow">Why marks were deducted</span>
-          {comments.map((comment) => <p key={comment}>{comment}</p>)}
-        </div>
-      )}
     </article>
   );
 }
