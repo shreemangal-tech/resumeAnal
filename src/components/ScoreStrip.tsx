@@ -1,11 +1,7 @@
 import { useState } from "react";
+import { deductionComments } from "../domain/deductionComments";
 import type { ParameterResult } from "../domain/types";
-
-const deductionComments = (parameter: ParameterResult) =>
-  parameter.criteria
-    .filter((criterion) => criterion.status === "not_followed")
-    .map((criterion) => criterion.criterionText.trim())
-    .filter(Boolean);
+import { downloadAuditExcel } from "../exportAuditExcel";
 
 const excelCell = (value: string) => value.replace(/\t/g, " ").replace(/\r?\n/g, " ").trim();
 
@@ -58,9 +54,12 @@ export function ScoreStrip({ parameters }: { parameters: ParameterResult[] }) {
   return (
     <div className="score-strip-region">
       <div className="score-strip-toolbar">
-        <p className="score-strip-help">Click a mark to copy it · hover a mark to see the deduction comment</p>
+        <p className="score-strip-help">Click a mark to copy · hover deducted marks for exact sheet comments</p>
         <button type="button" className="copy-marks-button" onClick={copyForExcel}>
-          {copyState === "copied" ? "Excel rows copied" : copyState === "error" ? "Copy blocked" : "Copy marks + comments for Excel"}
+          {copyState === "copied" ? "Excel rows copied" : copyState === "error" ? "Copy blocked" : "Copy marks + comments as rows"}
+        </button>
+        <button type="button" className="copy-marks-button" onClick={() => downloadAuditExcel(parameters)}>
+          Download Excel with hover comments
         </button>
       </div>
       <div className="score-strip" aria-label="Resume audit marks" tabIndex={0}>
@@ -80,10 +79,11 @@ export function ScoreStrip({ parameters }: { parameters: ParameterResult[] }) {
                   <span className="score-mark">{parameter.awardedScore}<small>/{parameter.maxScore}</small></span>
                   <span className="score-copy-hint">{copiedIndex === index ? "Copied" : "Click to copy"}</span>
                 </button>
-                <div className="score-comment-tooltip" role="tooltip">
-                  <strong>Deduction comment</strong>
-                  {comments.length > 0 ? comments.map((comment) => <p key={comment}>{comment}</p>) : <p>No marks deducted.</p>}
-                </div>
+                {comments.length > 0 && (
+                  <div className="score-comment-tooltip" role="tooltip">
+                    {comments.map((comment) => <p key={comment}>{comment}</p>)}
+                  </div>
+                )}
               </div>
             </div>
           );
